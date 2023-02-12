@@ -1,8 +1,7 @@
 # cbuffer
 
-simple buffer for c
+simple serialization for struct
 
 ## tip
 
-* 最多 2^16-1 个字段
-* 
+* 最多 255 个字段
