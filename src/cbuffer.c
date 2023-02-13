@@ -8,7 +8,9 @@
 
 void cbuffer_destroy(cbuffer_t **buffer) {
     if (buffer && *buffer) {
-        cbuffer_free(*buffer);
+        cbuffer_t *r = *buffer;
+        cbuffer_free(r->offset);
+        cbuffer_free(r);
         *buffer = NULL;
     }
 }
@@ -33,15 +35,18 @@ cbuffer_t *cbuffer_from(void *data) {
         return NULL;
     }
     memset(buffer, 0, sizeof(cbuffer_t));
+    // count
     buffer->count = *(uint8_t *) data;
-    uint32_t size = 4 * buffer->count;
-    void *index = cbuffer_malloc(size);
-    if (NULL == index) {
+    buffer->index = buffer->count; // not allow append
+    // offset
+    uint32_t size = 8 * buffer->count;
+    void *offset = cbuffer_malloc(size);
+    if (NULL == offset) {
         cbuffer_free(buffer);
         return NULL;
     }
-    memcpy(index, (char *) data + 1, size);
-    buffer->offset = index;
-    //    buffer->data = (char *) data + 1 + size;
+    memcpy(offset, (char *) data + 1, size);
+    buffer->offset = offset;
+    buffer->data.buffer = (char *) data + 1 + size;
     return buffer;
 }

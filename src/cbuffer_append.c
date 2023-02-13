@@ -47,14 +47,14 @@ int cbuffer_append_cbuffer(cbuffer_t *buffer, cbuffer_t *value, uint32_t num) {
         return -1;
     }
     uint32_t offset_size = value->count * 8;
-    uint32_t size = 4 + offset_size + value->data.size;
+    uint32_t size = 1 + offset_size + value->data.size;
     void *ptr = cbuffer_array_map(&buffer->data, size);
     if (NULL == ptr) {
         return -1;
     }
-    memcpy(ptr, &value->count, 4);
-    memcpy((char *) ptr + 4, value->offset, offset_size);
-    memcpy((char *) ptr + 4 + offset_size, value->data.buffer, value->data.size);
+    memcpy(ptr, &value->count, 1);
+    memcpy((char *) ptr + 1, value->offset, offset_size);
+    memcpy((char *) ptr + 1 + offset_size, value->data.buffer, value->data.size);
 
     uint32_t *dest = (uint32_t *) ((char *) buffer->offset + buffer->index * 8);
     *dest = num;
