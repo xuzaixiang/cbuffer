@@ -35,7 +35,7 @@ static int cbuffer_get(cbuffer_t *buffer, uint8_t index, void **data, uint32_t *
     uint32_t *buffer_offset = (uint32_t *) ((char *) buffer->offset + index * 8);
     uint32_t count = *buffer_offset;
     *num = count;
-    uint32_t offset = *(buffer_offset + 4);
+    uint32_t offset = *(buffer_offset + 1);
     *data = cbuffer_array_get(&buffer->data, offset);
     return 0;
 }

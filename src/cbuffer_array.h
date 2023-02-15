@@ -13,9 +13,7 @@ typedef struct cbuffer_array {
     uint32_t cap;
 } cbuffer_array_t;
 
-uint32_t cbuffer_array_append(cbuffer_array_t *array, void *data, uint32_t len);
-
-void *cbuffer_array_map(cbuffer_array_t *array, uint32_t size);
+int cbuffer_array_append(cbuffer_array_t *array, void *data, uint32_t len);
 
 void *cbuffer_array_get(cbuffer_array_t *array, uint32_t offset);
 

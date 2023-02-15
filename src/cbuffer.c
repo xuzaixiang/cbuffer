@@ -37,7 +37,7 @@ cbuffer_t *cbuffer_from(void *data) {
     memset(buffer, 0, sizeof(cbuffer_t));
     // count
     buffer->count = *(uint8_t *) data;
-    buffer->index = buffer->count; // not allow append
+    buffer->index = buffer->count;// not allow append
     // offset
     uint32_t size = 8 * buffer->count;
     void *offset = cbuffer_malloc(size);
@@ -47,6 +47,10 @@ cbuffer_t *cbuffer_from(void *data) {
     }
     memcpy(offset, (char *) data + 1, size);
     buffer->offset = offset;
+    // todo
     buffer->data.buffer = (char *) data + 1 + size;
     return buffer;
+}
+uint32_t cbuffer_size(cbuffer_t *buffer) {
+    return buffer->count * 8 + buffer->data.size + 1;
 }

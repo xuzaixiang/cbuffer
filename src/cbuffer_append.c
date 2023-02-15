@@ -3,6 +3,7 @@
 //
 
 #include "cbuffer_mem.h"
+#include <cbuffer/cbuffer.h>
 #include <string.h>
 
 static int cbuffer_append(cbuffer_t *buffer, void *data, uint32_t size, uint32_t count);
@@ -32,33 +33,32 @@ static int cbuffer_append(cbuffer_t *buffer, void *data, uint32_t size, uint32_t
         return -1;
     }
     uint32_t len = size * count;
-    uint32_t position = cbuffer_array_append(&buffer->data, data, len);
-    if (position <= 0) {
+    if (cbuffer_array_append(&buffer->data, data, len)) {
         return -1;
     }
     uint32_t *dest = (uint32_t *) ((char *) buffer->offset + buffer->index * 8);
     *dest = count;
-    *(dest + 4) = position - len;
+    *(dest + 1) = buffer->data.size - len;
     buffer->index += 1;
     return 0;
 }
-int cbuffer_append_cbuffer(cbuffer_t *buffer, cbuffer_t *value, uint32_t num) {
+int cbuffer_append_cbuffer(cbuffer_t *buffer, cbuffer_t *value) {
     if (buffer->index >= buffer->count) {
         return -1;
     }
-    uint32_t offset_size = value->count * 8;
-    uint32_t size = 1 + offset_size + value->data.size;
-    void *ptr = cbuffer_array_map(&buffer->data, size);
-    if (NULL == ptr) {
+    uint32_t size = cbuffer_size(value);
+    if (cbuffer_array_append(&buffer->data, NULL, size)) {
         return -1;
     }
+    char *ptr = (char *) buffer->data.buffer + buffer->data.size - size;
     memcpy(ptr, &value->count, 1);
-    memcpy((char *) ptr + 1, value->offset, offset_size);
-    memcpy((char *) ptr + 1 + offset_size, value->data.buffer, value->data.size);
+    uint32_t offset_size = value->count * 8;
+    memcpy(ptr + 1, value->offset, offset_size);
+    memcpy(ptr + 1 + offset_size, value->data.buffer, value->data.size);
 
     uint32_t *dest = (uint32_t *) ((char *) buffer->offset + buffer->index * 8);
-    *dest = num;
-    *(dest + 4) = (char *) ptr - (char *) buffer->data.buffer;
+    *dest = 1;
+    *(dest + 1) = buffer->data.size - size;
     buffer->index += 1;
     return 0;
 }

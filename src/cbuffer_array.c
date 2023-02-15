@@ -22,15 +22,17 @@ int cbuffer_array_expand(cbuffer_array_t *array) {
     return 0;
 }
 
-uint32_t cbuffer_array_append(cbuffer_array_t *array, void *data, uint32_t len) {
+int cbuffer_array_append(cbuffer_array_t *array, void *data, uint32_t len) {
     while (array->size + len > array->cap) {
         if (cbuffer_array_expand(array) != 0) {
-            return 0;
+            return -1;
         }
     }
-    memcpy((char *) array->buffer + array->size, data, len);
+    if (NULL != data) {
+        memcpy((char *) array->buffer + array->size, data, len);
+    }
     array->size += len;
-    return array->size;
+    return 0;
 }
 
 void *cbuffer_array_get(cbuffer_array_t *array, uint32_t offset) {
